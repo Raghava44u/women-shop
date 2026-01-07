@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>Cart</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div class="app-frame">
+    <header>
+      <div class="brand">Your Cart</div>
+      <button onclick="clearCart()" style="font-size:12px; color:red; border:none; background:none;">Clear</button>
+    </header>
+
+    <div class="content">
+      <div id="cartList"></div>
+      
+      <div id="summary" style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 15px; display:none;">
+        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:1.1rem;">
+          <span>Total</span>
+          <span id="totalPrice">$0</span>
+        </div>
+        <button class="btn-primary" onclick="window.location.href='checkout.html'">Checkout</button>
+      </div>
+      
+      <div id="emptyMsg" style="text-align:center; color:#999; margin-top:50px;">Cart is empty</div>
+    </div>
+
+    <div class="nav-bar">
+      <a href="index.html" class="nav-link"><span class="nav-icon">🏠</span>Home</a>
+      <a href="cart.html" class="nav-link active"><span class="nav-icon">🛒</span>Cart</a>
+      <a href="admin.html" class="nav-link"><span class="nav-icon">⚙️</span>Admin</a>
+    </div>
+  </div>
+
+  <script>
+    const list = document.getElementById('cartList');
+    const emptyMsg = document.getElementById('emptyMsg');
+    const summary = document.getElementById('summary');
+    
+    function loadCart() {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      
+      if (cart.length === 0) {
+        list.innerHTML = '';
+        emptyMsg.style.display = 'block';
+        summary.style.display = 'none';
+        return;
+      }
+
+      emptyMsg.style.display = 'none';
+      summary.style.display = 'block';
+      let total = 0;
+
+      list.innerHTML = cart.map((item, index) => {
+        total += Number(item.price);
+        return `
+        <div class="cart-item">
+          <img src="${item.img}" class="cart-thumb">
+          <div style="flex:1;">
+            <div style="font-weight:500;">${item.name}</div>
+            <div style="color:#666;">$${item.price}</div>
+          </div>
+          <button onclick="removeItem(${index})" style="color:red; background:none; border:none;">✕</button>
+        </div>
+        `;
+      }).join('');
+
+      document.getElementById('totalPrice').innerText = '$' + total;
+    }
+
+    function removeItem(index) {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      cart.splice(index, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      loadCart();
+    }
+
+    function clearCart() {
+      localStorage.removeItem('cart');
+      loadCart();
+    }
+
+    loadCart();
+  </script>
+</body>
+</html>
